@@ -4,29 +4,30 @@
  * User configuration
  */
 
-#define OW_PIN            4         // D2=GPIO4 one-wire data pin
+#define OW_PIN            2         // D4=GPIO2 one-wire data pin
 static byte               addr[][8] = {
-  {40,  95, 190, 242,   6,   0,   0,  94}, // DS18b20 IDs
+  {40, 255, 33, 46, 85, 22, 3, 242}, // DS18b20 IDs  40,  95, 190, 242,   6,   0,   0,  94
 };
 
 #define MAGIC_PIN          5        // D1=GPIO5  magic pin
 #define TIME_PIN          14        // D5=GPIO14 output timing pin
 
-#define SERIAL_BAUD       115200    // use 74880 to see the SDK messages
-//#define SERIAL_CHATTY
+#define SERIAL_BAUD       115200 
+#define SERIAL_CHATTY
 
-#define WIFI_SSID         "esp"    // your access point
-#define WIFI_PASSWORD     "esp8266wifi"
+#define WIFI_SSID         "" //Your Wifi     
+#define WIFI_PASSWORD     "" //Your Wifi's Password 
 
-#define WIFI_SERVER       "192.168.2.7"
-//#define WIFI_SERVER       "192.168.173.1" // on Windows
-#define WIFI_PORT         21883
+
+#define WIFI_SERVER       "api.thingspeak.com"
+
+const String THINGSPEAK_API_WRITE_KEY = ""; //Your Api Write Key on Thingspeak 
 
 //#define WIFI_USE_DHCP
 #define HOSTNAME          "esp-12c"
 static IPAddress          ip(192,168,2,52);  // static IP config
-static IPAddress          gw(192,168,2,7);
-static IPAddress          dns(192,168,2,7);
+static IPAddress          gw(192,168,173,1);  //192,168,2,7
+static IPAddress          dns(192,168,173,1); //192,168,2,7
 
 /*
  * The following three are wall clock ms
