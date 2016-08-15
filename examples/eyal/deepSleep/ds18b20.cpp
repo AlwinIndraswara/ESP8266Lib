@@ -64,8 +64,8 @@ read_temp(int n, byte addr[][8], float temp[])
 
 #ifdef SERIAL_CHATTY
   Serial.print("\nTemperature = ");
-  Serial.print(temp);
-  Serial.println("dC");
+  Serial.print(temp[0]);
+  Serial.println("Celcius");
 #endif
   return true;
 }

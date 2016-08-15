@@ -3,7 +3,7 @@
  */
 
 #include "deepSleep.h"
-
+#include <ESP8266WiFi.h>
 #include <WiFiUDP.h>
 
 static WiFiUDP            UDP;
@@ -93,38 +93,24 @@ set_up_wifi(void)
   time_wifi = micros();
 
 #ifdef SERIAL_CHATTY
-Serial.print("before set_up_wifi ssid='");
-Serial.print(WiFi.SSID());
-Serial.print("', lip=");
-Serial.print(WiFi.localIP());
-Serial.print(", ip=");
-Serial.println(ip);
-#endif
+Serial.println();
+Serial.println();
+Serial.print("Connecting to ");
+Serial.println(WIFI_SSID);
+  
+WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
-#ifdef WIFI_SSID
-  if (WiFi.SSID() != WIFI_SSID) {
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-//    if (!WiFi.getAutoConnect()) {
-//Serial.println("WiFi.setAutoConnect");
-//      WiFi.setAutoConnect(true);
-//    }
-  }
-#endif
-
-#ifndef WIFI_USE_DHCP
-  if (WiFi.localIP() != ip)
-    WiFi.config(ip, gw, dns);     // set static IP
-  if (WiFi.hostname() != HOSTNAME)
-    WiFi.hostname(HOSTNAME);
+while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+}
 #endif
 
 #ifdef SERIAL_CHATTY
-Serial.print("after set_up_wifi ssid='");
-Serial.print(WiFi.SSID());
-Serial.print("', lip=");
-Serial.print(WiFi.localIP());
-Serial.print(", ip=");
-Serial.println(ip);
+Serial.println("");
+Serial.println("WiFi connected");  
+Serial.println("IP address: ");
+Serial.println(WiFi.localIP());
 #endif
 
   return true;
@@ -170,11 +156,30 @@ wait_for_wifi(void)
 static bool
 send_udp(char *message)
 {
-  UDP.beginPacket(WIFI_SERVER, WIFI_PORT);
-  UDP.write(message);
-  UDP.endPacket();
-  time_udp_bug = millis() + UDP_DELAY_MS; // do not sleep earlier than this
-
+  WiFiClient client;
+  
+   if (client.connect(SERVER, 80)) { 
+   Serial.println("WiFi Client connected ");
+   String tsData = THINGSPEAK_API_WRITE_KEY;
+   tsData += "&field1=";
+   tsData += String(temp[0]);
+   tsData += "NAN";
+   
+   client.print("POST /update HTTP/1.1\n");
+   client.print("Host: api.thingspeak.com\n"); //api.thingspeak.com
+   client.print("Connection: close\n");
+   client.print("X-THINGSPEAKAPIKEY: " + THINGSPEAK_API_WRITE_KEY + "\n");
+   client.print("Content-Type: application/x-www-form-urlencoded\n");
+   client.print("Content-Length: ");
+   client.print(tsData.length());
+   client.print("\n\n");
+   client.print(tsData);
+   delay(1000);
+   
+   }//end if
+   int value = 0;
+   value++;
+   time_udp_bug = millis() + UDP_DELAY_MS; // do not sleep earlier than this
   return true;
 }
 
@@ -386,6 +391,7 @@ setup() {
 
   Serial.begin(SERIAL_BAUD);
   Serial.println("");
+  Serial.println("Starting Now"); 
 
   pinMode(MAGIC_PIN, INPUT_PULLUP);
   if (LOW == digitalRead(MAGIC_PIN)) {
@@ -393,7 +399,7 @@ setup() {
     ESP.deepSleep(0xFFFFFFFFUL, WAKE_RF_DISABLED); // about 80 minutes
   }
 
-//Serial.println("### setup");
+Serial.println("### setup");
 
   if (!rtc_init()) {  // first time
     Serial.println("### first run dsleep");

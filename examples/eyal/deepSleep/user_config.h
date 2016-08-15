@@ -12,14 +12,14 @@ static byte               addr[][8] = {
 #define MAGIC_PIN          5        // D1=GPIO5  magic pin
 #define TIME_PIN          14        // D5=GPIO14 output timing pin
 
-#define SERIAL_BAUD       115200 
+#define SERIAL_BAUD       115200 // use 74880 to see the SDK messages
 #define SERIAL_CHATTY
 
 #define WIFI_SSID         "" //Your Wifi     
 #define WIFI_PASSWORD     "" //Your Wifi's Password 
 
 
-#define WIFI_SERVER       "api.thingspeak.com"
+#define SERVER       "api.thingspeak.com"
 
 const String THINGSPEAK_API_WRITE_KEY = ""; //Your Api Write Key on Thingspeak 
 
